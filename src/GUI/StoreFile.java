@@ -1,0 +1,267 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package GUI;
+
+import java.security.Key;
+import javax.crypto.*;
+import javax.crypto.spec.*;      
+import DB.DbConnection;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.sql.PreparedStatement;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author Aditi
+ */
+public class StoreFile extends javax.swing.JFrame {
+
+    /**
+     * Creates new form VideoEncrypter
+     */
+    public StoreFile() {
+        initComponents();
+    }
+    
+    
+    
+    
+    
+   /* private byte[] getHashInBytes(String key) throws NoSuchAlgorithmException
+    {
+        byte[] keyHash;
+        final MessageDigest md = MessageDigest.getInstance("SHA-512");
+                keyHash = md.digest(key.getBytes());
+                StringBuilder sb = new StringBuilder();
+                for(int i=0; i< keyHash.length ;i++)
+                {
+                    sb.append(Integer.toString((keyHash[i] & 0xff) + 0x100, 16).substring(1));
+                }
+                String hashOfPassword = sb.toString();
+                return hashOfPassword.getBytes();
+                
+    }*/
+    
+    
+    
+    String key(){
+        String key=jTextField2.getText();
+        return key;
+    }
+    
+    private Key generateKey() throws Exception{
+        
+            byte[] keyValue = key().getBytes();
+            Key key = new SecretKeySpec(keyValue,"AES");
+            return key;
+        
+        
+        
+    }
+    
+    void EncryptFile() {
+        
+        try {
+                   Key key = generateKey();
+            Cipher c = Cipher.getInstance("AES");
+        c.init(Cipher.ENCRYPT_MODE,key);
+        JFileChooser obj = new JFileChooser();
+        obj.showOpenDialog(null);
+        File file = obj.getSelectedFile();
+        String filename=obj.getSelectedFile().getName();
+            FileInputStream obj1 = new FileInputStream(file);
+            byte[] data = new byte[obj1.available()];
+            obj1.read(data);
+            byte[] encVal = c.doFinal(data);
+            //String encryptedValue = Base64.getEncoder().encodeToString(encVal);
+            FileOutputStream obj2 = new FileOutputStream(file);
+            obj2.write(encVal);
+            obj2.close();
+            obj1.close();
+            //Connection conn =DbConnection.getConnection();
+            PreparedStatement ps = DbConnection.conn.prepareStatement("insert into encrypt(FileName,File) values(?,?)");
+          
+            FileInputStream fis = new FileInputStream(file);
+            ps.setString(1,filename);
+            ps.setBinaryStream(2,fis,fis.available());
+            ps.executeUpdate();
+            fis.close();
+            file.delete();
+            JOptionPane.showMessageDialog(null,"Congratulations!! The file has been safely Encrypted and Stored");
+                    }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    
+    /*void EncryptFile() {
+        int key=key();
+        JFileChooser obj = new JFileChooser();
+        obj.showOpenDialog(null);
+        File file = obj.getSelectedFile();
+        String filename=obj.getSelectedFile().getName();
+        byte[] keyHash;
+        
+        try {
+            keyHash=getHashInBytes(Integer.toString(key));
+            FileInputStream obj1 = new FileInputStream(file);
+            byte[] data = new byte[obj1.available()];
+            obj1.read(data);
+            int i;
+            for(i=0;i<data.length;i++){
+                data[i]=(byte)(data[i]^key);
+            }
+            FileOutputStream obj2 = new FileOutputStream(file);
+            obj2.write(keyHash, 0, 128); 
+            obj2.write(data);
+            obj2.close();
+            obj1.close();
+            //Connection conn =DbConnection.getConnection();
+            PreparedStatement ps = DbConnection.conn.prepareStatement("insert into encrypt(FileName,File) values(?,?)");
+          
+            FileInputStream fis = new FileInputStream(file);
+            ps.setString(1,filename);
+            ps.setBinaryStream(2,fis,fis.available());
+            ps.executeUpdate();
+            fis.close();
+            file.delete();
+            /*if(file.delete())
+                System.out.println("deleted");
+            else
+                System.out.println(" not deleted");
+            
+            
+            JOptionPane.showMessageDialog(null,"Congratulations!! The file has been safely Encrypted and Stored");
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }*/
+    
+    
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jTextField1 = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel1.setFont(new java.awt.Font("Segoe Script", 1, 48)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Cryptogram");
+        jLabel1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 204, 255), 5, true));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(88, 33, 636, 118));
+
+        jButton2.setFont(new java.awt.Font("MV Boli", 1, 21)); // NOI18N
+        jButton2.setForeground(new java.awt.Color(0, 0, 102));
+        jButton2.setText("Encrypt to Store");
+        jButton2.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 204, 255), 3, true));
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 300, 227, 50));
+
+        jButton4.setFont(new java.awt.Font("Segoe UI Semibold", 1, 18)); // NOI18N
+        jButton4.setForeground(new java.awt.Color(0, 102, 153));
+        jButton4.setText("Back");
+        jButton4.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 204, 255), 2, true));
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 460, 70, 37));
+
+        jLabel4.setFont(new java.awt.Font("Cambria", 1, 21)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(204, 255, 255));
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel4.setText("Enter Password:");
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 200, 170, 46));
+        getContentPane().add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 200, 188, 46));
+
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/bg.jpg"))); // NOI18N
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(-2, -4, 810, 520));
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        EncryptFile();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        setVisible(false);
+        HomePage obj = new HomePage();
+        obj.setVisible(true);
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(StoreFile.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(StoreFile.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(StoreFile.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(StoreFile.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new StoreFile().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    // End of variables declaration//GEN-END:variables
+}
